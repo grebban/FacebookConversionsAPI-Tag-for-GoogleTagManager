@@ -160,7 +160,7 @@ function setFbCookie(name, value, expire) {
 
 function getFbcValue() {
   let fbc = eventModel['x-fb-ck-fbc'] || getCookieValues('_fbc', true)[0];
-  const url = eventModel.page_location;
+  const url = pageLocationFromEventModel;
   const subDomainIndex = url ? computeEffectiveTldPlusOne(url).split('.').length - 1 : 1;
   const parsedUrl = parseUrl(url);
 
@@ -203,11 +203,14 @@ function getFacebookEventName(gtmEventName) {
 }
 
 const eventModel = getAllEventData();
+
+const pageLocationFromEventModel = eventModel.page_location || (eventModel['x-ga-system_properties'] && eventModel['x-ga-system_properties'].page_location || undefined);
+
 const event = {};
 event.event_name = getFacebookEventName(eventModel.event_name);
 event.event_time = eventModel.event_time || (Math.round(getTimestampMillis() / 1000));
 event.event_id = eventModel.event_id;
-event.event_source_url = eventModel.page_location;
+event.event_source_url = pageLocationFromEventModel;
 if(eventModel.action_source || data.actionSource) {
   event.action_source = eventModel.action_source ? eventModel.action_source : data.actionSource;
 }
